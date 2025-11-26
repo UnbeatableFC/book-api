@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "dev1": "nodemon server.js",
-    "start": "node server",
+    "start": "node server.js",
     "dev": "node --watch --env-file=.env server",
     "authDev": "node --watch --env-file=.env authServer"
   },
