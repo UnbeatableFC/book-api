@@ -44,6 +44,30 @@ export const logIn = async (req, res, next) => {
   }
 };
 
+export const logOut = async (req, res, next) => {
+  try {
+    // Get refresh token from request body
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      return res.status(400).json({ message: "Refresh token required" });
+    }
+
+    // Invalidate token in DB
+    await User.updateOne(
+      { refreshToken },
+      { $unset: { refreshToken: "" } }
+    );
+
+    return res.status(200).json({
+      message: "Logout successful",
+    });
+  } catch (error) {
+    console.error(error.message);
+    next(error);
+  }
+};
+
 export const refresh = async (req, res, next) => {
   const { refreshToken } = req.body;
 
@@ -63,7 +87,7 @@ export const refresh = async (req, res, next) => {
     // 2. Find the user based on the decoded payload ID
     const user = await UserModel.findById(decoded.id);
 
-    if (!user || !user.refreshTokenHash) {
+    if (!user || !user.refreshToken) {
       // Token is valid but user/token not found in DB
       return res
         .status(403)
@@ -73,7 +97,7 @@ export const refresh = async (req, res, next) => {
     // 3. Compare the sent plaintext token against the stored HASH
     const isTokenMatch = await bcrypt.compare(
       refreshToken,
-      user.refreshTokenHash
+      user.refreshToken
     );
 
     if (!isTokenMatch) {
@@ -99,7 +123,7 @@ export const refresh = async (req, res, next) => {
       newRefreshToken,
       10
     );
-    user.refreshTokenHash = hashedNewRefreshToken;
+    user.refreshToken = hashedNewRefreshToken;
     await user.save();
 
     res.status(200).json({

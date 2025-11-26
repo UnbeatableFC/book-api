@@ -4,17 +4,31 @@ import { UserModel } from "../models/UserModel.js";
 
 // Helper to generate tokens
 const generateTokens = (user) => {
-  const payload = { id: user._id, username: user.username, email: user.email };
-  const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
-  const refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "7d" });
+  const payload = {
+    id: user._id,
+    username: user.username,
+    email: user.email,
+  };
+  const accessToken = jwt.sign(
+    payload,
+    process.env.ACCESS_TOKEN_SECRET,
+    { expiresIn: "15m" }
+  );
+  const refreshToken = jwt.sign(
+    payload,
+    process.env.REFRESH_TOKEN_SECRET,
+    { expiresIn: "7d" }
+  );
   return { accessToken, refreshToken };
 };
 
 export const createNewUser = async (userData) => {
-  const { username, email, password } = userData;
+  const { username, email, password, role } = userData;
 
   // 1. Check duplicates
-  const existingUser = await UserModel.findOne({ $or: [{ email }, { username }] });
+  const existingUser = await UserModel.findOne({
+    $or: [{ email }, { username }],
+  });
   if (existingUser) {
     throw new Error("User already exists"); // Throw error, don't send res
   }
@@ -25,6 +39,7 @@ export const createNewUser = async (userData) => {
     username,
     email,
     password: hashedPassword,
+    role,
   });
 
   return user; // Return the data
@@ -48,10 +63,10 @@ export const loginUser = async (loginData) => {
   // 3. Return Tokens
   const { accessToken, refreshToken } = generateTokens(user);
   const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
-    
-    // Assuming you added 'refreshTokenHash: String' to your UserModel schema
-    user.refreshTokenHash = hashedRefreshToken;
-    await user.save(); 
-    
-    return { accessToken, refreshToken };
+
+  // Assuming you added 'refreshToken: String' to your UserModel schema
+  user.refreshToken = hashedRefreshToken;
+  await user.save();
+
+  return { accessToken, refreshToken };
 };

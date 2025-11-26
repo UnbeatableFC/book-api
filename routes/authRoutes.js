@@ -1,11 +1,14 @@
 import { Router } from "express";
-import { logIn, refresh, signUp } from "../controllers/authControllers.js";
+import { logIn, logOut, refresh, signUp } from "../controllers/authControllers.js";
 
 
 const router = Router();
 
 // Login Route
 router.post("/login", logIn);
+
+// Logout Route
+router.delete("/logout" , logOut)
 
 // Sign Up Route
 router.post("/signup", signUp);

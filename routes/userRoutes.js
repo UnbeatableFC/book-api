@@ -5,6 +5,7 @@ import {
   getUser,
   updateUser,
 } from "../controllers/userControllers.js";
+import { isAdmin } from "../middlewares/isAdmin.js";
 
 const router = Router();
 
@@ -18,6 +19,6 @@ router.get("/:id", getUser);
 router.put("/:id", updateUser);
 
 // Delete user route
-router.delete("/:id", deleteUser);
+router.delete("/:id", isAdmin, deleteUser);
 
 export default router;
