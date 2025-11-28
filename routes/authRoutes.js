@@ -8,7 +8,7 @@ const router = Router();
 router.post("/login", logIn);
 
 // Logout Route
-router.delete("/logout" , logOut)
+router.post("/logout" , logOut)
 
 // Sign Up Route
 router.post("/signup", signUp);
