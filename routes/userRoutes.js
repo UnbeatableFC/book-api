@@ -6,19 +6,20 @@ import {
   updateUser,
 } from "../controllers/userControllers.js";
 import { isAdmin } from "../middlewares/isAdmin.js";
+import { authenticateToken } from "../middlewares/auth.js";
 
 const router = Router();
 
 // Get all users route
-router.get("/", getAllUsers);
+router.get("/", authenticateToken, getAllUsers);
 
 // Get single user route
-router.get("/:id", getUser);
+router.get("/:id", authenticateToken, getUser);
 
 // Update user route
-router.put("/:id", updateUser);
+router.put("/:id", authenticateToken, updateUser);
 
 // Delete user route
-router.delete("/:id", isAdmin, deleteUser);
+router.delete("/:id", isAdmin, authenticateToken, deleteUser);
 
 export default router;
